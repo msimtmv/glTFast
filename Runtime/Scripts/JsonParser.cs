@@ -35,7 +35,11 @@ namespace GLTFast {
             // Step one: main JSON parsing
             Profiler.BeginSample("JSON main");
             try {
-                root = JsonUtility.FromJson<Root>(json);
+                var settings = new Newtonsoft.Json.JsonSerializerSettings() {
+                    ContractResolver = new CustomExtensionContractResolver(),
+                };
+
+                root = Newtonsoft.Json.JsonConvert.DeserializeObject<Root>(json, settings);
             }
             catch (System.ArgumentException) {
                 return null;

@@ -13,24 +13,20 @@
 // limitations under the License.
 //
 
-namespace GLTFast.Schema {
-    
-    /// <summary>
-    /// TextureInfo extensions
-    /// </summary>
-    [System.Serializable]
-    public class TextureInfoExtension : ExtensibleObject {
-        
-        /// <inheritdoc cref="Extension.TextureTransform"/>
-        public TextureTransform KHR_texture_transform;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-        internal void GltfSerialize(JsonWriter writer) {
-            if(KHR_texture_transform != null) {
-                writer.AddObject();
-                writer.AddProperty("KHR_texture_transform");
-                KHR_texture_transform.GltfSerialize(writer);
-                writer.Close();
-            }
-        }
+namespace GLTFast.Schema
+{
+    /// <summary>
+    /// Base class for object that can receive extensions. Upon parsing,
+    /// registered and unknown extensions data are gathered in genericProperties
+    /// Unknow extensions data are of type IGltfJsonToken
+    /// </summary>
+    public abstract class ExtensibleObject
+    {
+        [NonSerialized]
+        public Dictionary<string /*extension name*/, object /*extension specific data*/> genericProperties;
     }
 }

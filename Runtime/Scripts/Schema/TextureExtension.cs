@@ -19,7 +19,7 @@ namespace GLTFast.Schema {
     /// Texture extensions
     /// </summary>
     [System.Serializable]
-    public class TextureExtension {
+    public class TextureExtension : ExtensibleObject {
         
         /// <inheritdoc cref="Extension.TextureBasisUniversal"/>
         public TextureBasisUniversal KHR_texture_basisu = null;

@@ -19,7 +19,7 @@ namespace GLTFast.Schema {
     /// Material extensions.
     /// </summary>
     [System.Serializable]
-    public class MaterialExtension {
+    public class MaterialExtension : ExtensibleObject {
         
         // Names are identical to glTF specified property names, that's why
         // inconsistent names are ignored.

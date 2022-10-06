@@ -98,7 +98,7 @@ namespace GLTFast.Schema {
 
 #if MESHOPT
     [System.Serializable]
-    public class BufferViewExtensions {
+    public class BufferViewExtensions : ExtensibleObject {
         public BufferViewMeshoptExtension EXT_meshopt_compression;
     }
     

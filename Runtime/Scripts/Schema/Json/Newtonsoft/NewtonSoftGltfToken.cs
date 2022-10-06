@@ -13,24 +13,24 @@
 // limitations under the License.
 //
 
-namespace GLTFast.Schema {
-    
-    /// <summary>
-    /// TextureInfo extensions
-    /// </summary>
-    [System.Serializable]
-    public class TextureInfoExtension : ExtensibleObject {
-        
-        /// <inheritdoc cref="Extension.TextureTransform"/>
-        public TextureTransform KHR_texture_transform;
+using Newtonsoft.Json.Linq;
 
-        internal void GltfSerialize(JsonWriter writer) {
-            if(KHR_texture_transform != null) {
-                writer.AddObject();
-                writer.AddProperty("KHR_texture_transform");
-                KHR_texture_transform.GltfSerialize(writer);
-                writer.Close();
-            }
+namespace GLTFast.Schema
+{
+    class NewtonSoftGltfToken : IGltfJsonToken
+    {
+        JToken m_Token;
+        
+        internal NewtonSoftGltfToken(JToken token)
+        {
+            m_Token = token;
         }
+
+        public T ToObject<T>() => m_Token.ToObject<T>();
+
+        public IGltfJsonToken this[object key] => new NewtonSoftGltfToken(m_Token[key]);
+
+        public new string ToString() => m_Token.ToString();
+
     }
 }

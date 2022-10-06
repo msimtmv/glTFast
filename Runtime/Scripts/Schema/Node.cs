@@ -119,7 +119,7 @@ namespace GLTFast.Schema {
     /// Node extensions
     /// </summary>
     [System.Serializable]
-    public class NodeExtensions {
+    public class NodeExtensions : ExtensibleObject {
         // Names are identical to glTF specified properties, that's why
         // inconsistent names are ignored.
         // ReSharper disable InconsistentNaming

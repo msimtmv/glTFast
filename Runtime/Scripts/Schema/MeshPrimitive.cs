@@ -280,7 +280,7 @@ namespace GLTFast.Schema {
     /// Mesh primitive extensions
     /// </summary>
     [System.Serializable]
-    public class MeshPrimitiveExtensions {
+    public class MeshPrimitiveExtensions : ExtensibleObject {
 #if DRACO_UNITY
         public MeshPrimitiveDracoExtension KHR_draco_mesh_compression;
 #endif

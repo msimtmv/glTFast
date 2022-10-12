@@ -129,7 +129,7 @@ namespace GLTFast.Export {
         /// </summary>
         /// <param name="extension">Extension's name</param>
         /// <param name="required">True if extension is required and used. False if it's used only</param>
-        void RegisterExtensionUsage(Extension extension, bool required = true);
+        void RegisterExtensionUsage(string extension, bool required = true);
         
         /// <summary>
         /// Exports the collected scenes/content as glTF, writes it to a file

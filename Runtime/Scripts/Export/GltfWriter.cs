@@ -85,13 +85,14 @@ namespace GLTFast.Export {
         State m_State;
 
         ExportSettings m_Settings;
+        ExportDelegates m_Delegates;
         IDeferAgent m_DeferAgent;
         ICodeLogger m_Logger;
         
         Root m_Gltf;
 
-        HashSet<Extension> m_ExtensionsUsedOnly;
-        HashSet<Extension> m_ExtensionsRequired;
+        HashSet<string> m_ExtensionsUsedOnly;
+        HashSet<string> m_ExtensionsRequired;
         
         List<Scene> m_Scenes;
         List<Node> m_Nodes;
@@ -119,18 +120,21 @@ namespace GLTFast.Export {
         /// Provides glTF export independent of workflow (GameObjects/Entities)
         /// </summary>
         /// <param name="exportSettings">Export settings</param>
+        /// <param name="exportDelegates">Export delegates</param>
         /// <param name="deferAgent">Defer agent; decides when/if to preempt
         /// export to preserve a stable frame rate <seealso cref="IDeferAgent"/></param>
         /// <param name="logger">Interface for logging (error) messages
         /// <seealso cref="ConsoleLogger"/></param>
         public GltfWriter(
             ExportSettings exportSettings = null,
+            ExportDelegates exportDelegates = null,
             IDeferAgent deferAgent = null,
             ICodeLogger logger = null
             )
         {
             m_Gltf = new Root();
             m_Settings = exportSettings ?? new ExportSettings();
+            m_Delegates = exportDelegates;
             m_Logger = logger;
             m_State = State.Initialized;
             m_DeferAgent = deferAgent ?? new UninterruptedDeferAgent();
@@ -445,14 +449,14 @@ namespace GLTFast.Export {
         }
 
         /// <inheritdoc />
-        public void RegisterExtensionUsage(Extension extension, bool required = true) {
+        public void RegisterExtensionUsage(string extension, bool required = true) {
             CertifyNotDisposed();
             if (required) {
-                m_ExtensionsRequired = m_ExtensionsRequired ?? new HashSet<Extension>();
+                m_ExtensionsRequired = m_ExtensionsRequired ?? new HashSet<string>();
                 m_ExtensionsRequired.Add(extension);
             } else {
                 if (m_ExtensionsRequired == null || !m_ExtensionsRequired.Contains(extension)) {
-                    m_ExtensionsUsedOnly = m_ExtensionsUsedOnly ?? new HashSet<Extension>();
+                    m_ExtensionsUsedOnly = m_ExtensionsUsedOnly ?? new HashSet<string>();
                     m_ExtensionsUsedOnly.Add(extension);
                 }
             }
@@ -646,8 +650,15 @@ namespace GLTFast.Export {
 
             AssignMaterialsToMeshes();
 
-            var success = await BakeImages(directory);
+            var tasks = new List<Task<bool>>();
+            tasks.Add( BakeImages(directory) );
 
+            // invokees are responsible to start their long standing export tasks
+            m_Delegates?.bake?.Invoke(directory, tasks);
+
+            await Task.WhenAll(tasks);
+
+            var success = tasks.TrueForAll(t => !t.IsFaulted && t.Result);
             if (!success) return false;
             
             if (m_BufferStream != null && m_BufferStream.Length > 0) {
@@ -671,7 +682,7 @@ namespace GLTFast.Export {
             m_Gltf.cameras = m_Cameras?.ToArray();
 
             if (m_Lights != null && m_Lights.Count > 0) {
-                RegisterExtensionUsage(Extension.LightsPunctual);
+                RegisterExtensionUsage(Extension.LightsPunctual.GetName());
                 m_Gltf.extensions = m_Gltf.extensions ?? new Schema.RootExtension();
                 m_Gltf.extensions.KHR_lights_punctual = m_Gltf.extensions.KHR_lights_punctual ?? new LightsPunctual();
                 m_Gltf.extensions.KHR_lights_punctual.lights = m_Lights.ToArray();
@@ -682,7 +693,11 @@ namespace GLTFast.Export {
                 generator = $"Unity {Application.unityVersion} glTFast {Constants.version}"
             };
             
+            // invokees are responsible to update m_Gltf members with previously collected/processed data
+            m_Delegates?.update?.Invoke(m_Gltf, this);
+
             BakeExtensions();
+
             return true;
         }
 
@@ -693,7 +708,7 @@ namespace GLTFast.Export {
                 m_Gltf.extensionsUsed = new string[m_ExtensionsRequired.Count + usedOnlyCount];
                 var i = 0;
                 foreach (var extension in m_ExtensionsRequired) {
-                    var name = extension.GetName();
+                    var name = extension;
                     Assert.IsFalse(string.IsNullOrEmpty(name));
                     m_Gltf.extensionsRequired[i] = name;
                     m_Gltf.extensionsUsed[i] = name;
@@ -711,7 +726,7 @@ namespace GLTFast.Export {
                 }
 
                 foreach (var extension in m_ExtensionsUsedOnly) {
-                    m_Gltf.extensionsUsed[i++] = extension.GetName();
+                    m_Gltf.extensionsUsed[i++] = extension;
                 }
             }
         }
@@ -1785,6 +1800,9 @@ namespace GLTFast.Export {
             m_Samplers = null;
             
             m_State = State.Disposed;
+            
+            m_Delegates?.dispose?.Invoke();
+            m_Delegates = null;
         }
         
         static unsafe int GetAttributeSize(VertexAttributeFormat format) {

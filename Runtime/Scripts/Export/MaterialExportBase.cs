@@ -126,7 +126,7 @@ namespace GLTFast.Export {
             )
         {
 
-            gltf.RegisterExtensionUsage(Extension.MaterialsUnlit);
+            gltf.RegisterExtensionUsage(Extension.MaterialsUnlit.GetName());
             material.extensions = material.extensions ?? new MaterialExtension();
             material.extensions.KHR_materials_unlit = new MaterialUnlit();
 	        
@@ -249,7 +249,7 @@ namespace GLTFast.Export {
             scale.y *= -1;
 
             if (offset != Vector2.zero || scale != Vector2.one) {
-                gltf.RegisterExtensionUsage(Extension.TextureTransform);
+                gltf.RegisterExtensionUsage(Extension.TextureTransform.GetName());
                 def.extensions = def.extensions ?? new TextureInfoExtension();
                 def.extensions.KHR_texture_transform = new TextureTransform {
                     scale = new[] { scale.x, scale.y },

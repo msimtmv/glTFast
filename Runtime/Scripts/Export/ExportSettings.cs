@@ -13,6 +13,9 @@
 // limitations under the License.
 //
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GLTFast.Schema;
 using UnityEngine;
 
 namespace GLTFast.Export {
@@ -83,5 +86,35 @@ namespace GLTFast.Export {
         /// </summary>
         [Tooltip("Light intensity values are multiplied by this factor")]
         public float lightIntensityFactor = 1.0f;
+    }
+
+    /// <summary>
+    /// Encapsulate delegates invoked by IGltfWritable sub classes. Typical use case is to
+    /// process information gather in GameObjectExportDelegates and update members
+    /// of GLTFast.Schema.Root.
+    /// </summary>
+    public class ExportDelegates {
+        /// <summary>
+        /// Invoked when gathered information needs long standing processing. 
+        /// <param name="directory"></param>
+        /// <param name="tasks">Add created tasks to this list so export process can be synchronized</param>
+        /// </summary>
+        public delegate void Bake(string directory, List<Task<bool>> tasks);
+
+        /// <summary>
+        /// Invoked just before gltf is written to disk. Typical use case is to update relevant members
+        /// of GLTFast.Schema.Root 
+        /// <param name="root">Gltf object to update</param>
+        /// </summary>
+        public delegate void Update(Root root, IGltfWritable gltfWritable);
+        
+        /// <summary>
+        /// Invoked when export process is done 
+        /// </summary>
+        public delegate void Dispose();
+
+        public Bake bake;
+        public Update update;
+        public Dispose dispose;
     }
 }

@@ -32,6 +32,7 @@ namespace GLTFast.Export {
         IMaterialExport m_MaterialExport;
         GameObjectExportSettings m_Settings;
         ICodeLogger m_Logger;
+        GameObjectExportDelegates m_Delegates;
 
         /// <summary>
         /// Provides glTF export of GameObject based scenes and hierarchies.
@@ -43,17 +44,23 @@ namespace GLTFast.Export {
         /// export to preserve a stable frame rate <seealso cref="IDeferAgent"/></param>
         /// <param name="logger">Interface for logging (error) messages
         /// <seealso cref="ConsoleLogger"/></param>
+        /// <param name="exportDelegates">Delegates handling intermediate information</param>
+        /// <param name="gameObjectExportDelegates">Delegates handling game object information</param>
         public GameObjectExport(
             ExportSettings exportSettings = null,
             GameObjectExportSettings gameObjectExportSettings = null,
             IMaterialExport materialExport = null,
             IDeferAgent deferAgent = null,
-            ICodeLogger logger = null
+            ICodeLogger logger = null,
+            ExportDelegates exportDelegates = null,
+            GameObjectExportDelegates gameObjectExportDelegates = null
         ) {
             m_Settings = gameObjectExportSettings ?? new GameObjectExportSettings();
-            m_Writer = new GltfWriter(exportSettings, deferAgent, logger);
+            m_Writer = new GltfWriter(exportSettings, exportDelegates, deferAgent, logger);
             m_MaterialExport = materialExport ?? MaterialExport.GetDefaultMaterialExport();
             m_Logger = logger;
+            m_Delegates = gameObjectExportDelegates;
+            m_Delegates?.reset?.Invoke();
         }
 
         /// <summary>
@@ -81,6 +88,9 @@ namespace GLTFast.Export {
             }
             if (rootNodes.Count > 0) {
                 m_Writer.AddScene(rootNodes.ToArray(), name);
+
+                // invokees are responsible to collect information relevant to this scene
+                m_Delegates?.sceneAdded?.Invoke(name);
             }
 
             return success;
@@ -190,6 +200,10 @@ namespace GLTFast.Export {
                     m_Writer.AddLightToNode(nodeId,lightId);
                 }
             }
+
+            // invokees are responsible to collect information relevant to this game object
+            m_Delegates?.gameObjectAdded?.Invoke(gameObject, nodeId);
+
             return success;
         }
     }

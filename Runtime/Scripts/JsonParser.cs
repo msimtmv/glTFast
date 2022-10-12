@@ -60,7 +60,7 @@ namespace GLTFast {
                     // mat.extension is always set (not null), because JsonUtility constructs a default
                     // if any of mat.extension's members is not null, it is because there was
                     // a legit extensions node in JSON => we have to check which ones
-                    if (mat.extensions.KHR_materials_unlit != null) {
+                    if (mat.extensions?.KHR_materials_unlit != null) {
                         check = true;
                     } else {
                         // otherwise dump the wrongfully constructed MaterialExtension
@@ -71,7 +71,7 @@ namespace GLTFast {
             if(root.accessors != null) {
                 for (int i = 0; i < root.accessors.Length; i++) {
                     var accessor = root.accessors[i];
-                    if (accessor.sparse.indices == null || accessor.sparse.values == null) {
+                    if (accessor.sparse == null || accessor.sparse.indices == null || accessor.sparse.values == null) {
                         // If indices and values members are null, `sparse` is likely
                         // an auto-instance by the JsonUtility and not present in JSON.
                         // Therefore we remove it:

@@ -34,6 +34,8 @@ namespace GLTFast
                 {
                     AddExtension((ExtensibleObject) o, key, value);
                 };
+
+                objectContract.ExtensionDataGetter = o => GetExtensions((ExtensibleObject) o);
             }
 
             return objectContract;
@@ -41,18 +43,37 @@ namespace GLTFast
 
         void AddExtension(ExtensibleObject extensible, string key, object jValue)
         {
-            var valueParser = CustomExtensionRegistry.GetParser(extensible.GetType(), key);
+            var valueType = CustomPropertyRegistry.GetPropertyType(extensible.GetType(), key);
             var jToken = JToken.FromObject(jValue);
-            var gltfToken = new NewtonSoftGltfToken(jToken);
 
             extensible.genericProperties ??= new Dictionary<string, object>();
-            
-            if (valueParser == null)
-                extensible.genericProperties.Add(key,  gltfToken);
+
+            if (valueType == null)
+            {
+                var value = new NewtonSoftGltfToken(jToken);
+                extensible.genericProperties.Add(key, value);
+            }
             else
             {
-                var value = valueParser.Deserialize(gltfToken);
+                var value = jToken.ToObject(valueType);
                 extensible.genericProperties.Add(key, value);   
+            }
+        }
+
+        IEnumerable<KeyValuePair<object, object>> GetExtensions(ExtensibleObject extensibleObject)
+        {
+            // TODO: seems very inefficient review how ExtensibleObject store its properties
+            //       or find a better way to handle this with NewtonSoft
+
+            if (extensibleObject.genericProperties == null)
+                yield break;
+
+            foreach (var property in extensibleObject.genericProperties)
+            {
+                if (property.Value is NewtonSoftGltfToken gltfToken)
+                    yield return KeyValuePair.Create<object, object>(property.Key, gltfToken.innerObject);
+
+                yield return KeyValuePair.Create<object, object>(property.Key, property.Value);
             }
         }
     }

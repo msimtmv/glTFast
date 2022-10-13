@@ -18,18 +18,10 @@ using System;
 namespace GLTFast.Schema
 {
     /// <summary>
-    /// Generic object access and parsing. It is expected that
-    /// custom extensions register their own type via CustomExtensionRegistry
+    /// Generic object access.
     /// </summary>
     public interface IGltfJsonToken
     {
-        /// <summary>
-        /// Deserialisation
-        /// </summary>
-        /// <typeparam name="T">Type of object to deserialize</typeparam>
-        /// <returns></returns>
-        T ToObject<T>();
-        
         /// <summary>
         /// Generic value accessor
         ///  
@@ -43,6 +35,8 @@ namespace GLTFast.Schema
         /// token["propName1"]["propName2"].ToObject<string>()
         /// </summary>
         IGltfJsonToken this[object key] { get; }
+
+        // TODO add casting operators
 
         string ToString();
     }

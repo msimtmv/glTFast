@@ -44,6 +44,25 @@ namespace GLTFast.Export {
         );
 
         /// <summary>
+        /// Set generic data in this gltf writable. Typical use case are custom extensions.
+        /// </summary>
+        /// <param name="name">Unique name to register the data</param>
+        /// <param name="data">Data to set</param>
+        /// <returns></returns>
+        bool SetCustomData(string name, object data);
+
+        /// <summary>
+        /// Retrieve data set by  SetCustomData
+        /// </summary>
+        /// <param name="name">Unique name used when registering the data</param>
+        /// <typeparam name="T">Type of expected data</typeparam>
+        /// <returns></returns>
+        T GetCustomData<T>(string name) where T : class;
+
+        Schema.Node GetNode(int nodeId);
+        Schema.RootExtension GetRootExtension();
+
+        /// <summary>
         /// Assigns a mesh to a previously added node
         /// </summary>
         /// <param name="nodeId">Index of the node to add the mesh to</param>

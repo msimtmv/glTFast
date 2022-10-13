@@ -30,6 +30,7 @@ namespace GLTFast.Schema {
         /// <summary>
         /// The index of the mesh in this node.
         /// </summary>
+        [System.ComponentModel.DefaultValue(-1)]
         public int mesh = -1;
 
         /// <summary>
@@ -61,11 +62,13 @@ namespace GLTFast.Schema {
 
         /// <summary>
         /// </summary>
+        [System.ComponentModel.DefaultValue(-1)]
         public int skin = -1;
 
         /// <summary>
         /// Camera index
         /// </summary>
+        [System.ComponentModel.DefaultValue(-1)]
         public int camera = -1;
 
         /// <inheritdoc cref="NodeExtensions"/>

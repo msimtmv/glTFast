@@ -89,32 +89,58 @@ namespace GLTFast.Export {
     }
 
     /// <summary>
-    /// Encapsulate delegates invoked by IGltfWritable sub classes. Typical use case is to
-    /// process information gather in GameObjectExportDelegates and update members
-    /// of GLTFast.Schema.Root.
+    /// Encapsulate delegates invoked by GameObjectExport and IGltfWritable sub classes.
     /// </summary>
-    public class ExportDelegates {
+    public static class ExportDelegates {
         /// <summary>
-        /// Invoked when gathered information needs long standing processing. 
+        /// Invoked at the start of the export process.
+        /// <param name="gltf">Gltf object to store/retrieve info from</param> 
+        /// </summary>
+        public delegate void ExportInstanceCreated(IGltfWritable gltf);
+        
+        /// <summary>
+        /// Invoked when a game object is processed. Invokee are responsible to collect
+        /// relevant information to be later processed and added to a GLTFast.Schema.Root
+        /// <param name="gltf">Gltf object to store/retrieve info from</param>
+        /// <param name="gameObject">Game object to process</param>
+        /// <param name="nodeId">gltf node to which this game object is tied to</param> 
+        /// </summary>
+        public delegate void GameObjectAdded(IGltfWritable gltf, GameObject gameObject, int nodeId);
+        
+        /// <summary>
+        /// Invoked when a scene is processed. Invokee are responsible to collect
+        /// relevant information to be later processed and added to a GLTFast.Schema.Root
+        /// <param name="gltf">Gltf object to store/retrieve info from</param>
+        /// <param name="name">Name of the added scene</param> 
+        /// </summary>
+        public delegate void SceneAdded(IGltfWritable gltf, string name);
+        
+        /// <summary>
+        /// Invoked when gathered information needs long standing processing. For example, compressing data
+        /// <param name="gltf">Gltf object to store/retrieve info from</param>
         /// <param name="directory"></param>
         /// <param name="tasks">Add created tasks to this list so export process can be synchronized</param>
         /// </summary>
-        public delegate void Bake(string directory, List<Task<bool>> tasks);
+        public delegate void Bake(IGltfWritable gltfWritable, string directory, List<Task<bool>> tasks);
 
         /// <summary>
         /// Invoked just before gltf is written to disk. Typical use case is to update relevant members
         /// of GLTFast.Schema.Root 
-        /// <param name="root">Gltf object to update</param>
+        /// <param name="gltf">Gltf object to store/retrieve info from</param>
         /// </summary>
-        public delegate void Update(Root root, IGltfWritable gltfWritable);
+        public delegate void Update(IGltfWritable gltfWritable);
         
         /// <summary>
-        /// Invoked when export process is done 
+        /// Invoked when export process is done.
+        /// <param name="gltf">Gltf object to store/retrieve info from</param>
         /// </summary>
-        public delegate void Dispose();
+        public delegate void Disposing(IGltfWritable gltfWritable);
 
-        public Bake bake;
-        public Update update;
-        public Dispose dispose;
+        public static ExportInstanceCreated exportInstanceCreated;
+        public static GameObjectAdded gameObjectAdded;
+        public static SceneAdded sceneAdded;
+        public static Bake bake;
+        public static Update update;
+        public static Disposing disposing;
     }
 }

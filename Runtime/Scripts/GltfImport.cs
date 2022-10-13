@@ -811,12 +811,12 @@ namespace GLTFast {
             if (deferAgent.ShouldDefer(predictedTime)) {
                 // JSON is larger than threshold
                 // => parse in a thread
-                gltfRoot = await Task.Run( () => JsonParser.ParseJson(json) );
+                gltfRoot = await Task.Run( () => JsonParser.Deserialize(json) );
             } else
 #endif
             {
                 // Parse immediately on main thread
-                gltfRoot = JsonParser.ParseJson(json);
+                gltfRoot = JsonParser.Deserialize(json);
                 // Loading subsequent buffers and images has to start asap.
                 // That's why parsing JSON right away is *very* important. 
             }

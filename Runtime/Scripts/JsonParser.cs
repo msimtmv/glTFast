@@ -13,6 +13,9 @@
 // limitations under the License.
 //
 
+using System;
+using System.IO;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
@@ -22,7 +25,7 @@ namespace GLTFast {
     using Schema;
     
     class JsonParser {
-        internal static Root ParseJson(string json) {
+        internal static Root Deserialize(string json) {
             // JsonUtility sometimes creates non-null default instances of objects-type members
             // even though there are none in the original JSON.
             // This work-around makes sure not existent JSON nodes will be null in the result.
@@ -35,11 +38,11 @@ namespace GLTFast {
             // Step one: main JSON parsing
             Profiler.BeginSample("JSON main");
             try {
-                var settings = new Newtonsoft.Json.JsonSerializerSettings() {
+                var settings = new JsonSerializerSettings() {
                     ContractResolver = new CustomExtensionContractResolver(),
                 };
 
-                root = Newtonsoft.Json.JsonConvert.DeserializeObject<Root>(json, settings);
+                root = JsonConvert.DeserializeObject<Root>(json, settings);
             }
             catch (System.ArgumentException) {
                 return null;
@@ -203,6 +206,34 @@ namespace GLTFast {
             Debug.Log($"JSON throughput: {throughput} bytes/sec ({json.Length} bytes in {elapsedSeconds} seconds)");
 #endif
             return root;
+        }
+
+        internal static bool Serialize(StreamWriter stream, Root root)
+        {
+            var success = true;
+
+            Profiler.BeginSample("JSON Serialize");
+            try 
+            {
+                var settings = new JsonSerializerSettings() 
+                {
+                    ContractResolver = new CustomExtensionContractResolver(),
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore,
+                };
+
+                var json = JsonConvert.SerializeObject(root, Formatting.Indented, settings);
+                stream.Write(json);
+            }
+            catch (Exception e)
+            {
+                // TODO: log this properly with glTFast system
+                Debug.LogError(e.Message);
+                success = false;
+            }
+            Profiler.EndSample();
+
+            return success;
         }
     }
 }

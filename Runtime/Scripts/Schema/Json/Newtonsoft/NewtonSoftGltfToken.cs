@@ -20,17 +20,16 @@ namespace GLTFast.Schema
     class NewtonSoftGltfToken : IGltfJsonToken
     {
         JToken m_Token;
-        
+
         internal NewtonSoftGltfToken(JToken token)
         {
             m_Token = token;
         }
 
-        public T ToObject<T>() => m_Token.ToObject<T>();
+        internal object innerObject => m_Token;
 
         public IGltfJsonToken this[object key] => new NewtonSoftGltfToken(m_Token[key]);
 
         public new string ToString() => m_Token.ToString();
-
     }
 }

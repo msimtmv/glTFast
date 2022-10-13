@@ -85,7 +85,6 @@ namespace GLTFast.Export {
         State m_State;
 
         ExportSettings m_Settings;
-        ExportDelegates m_Delegates;
         IDeferAgent m_DeferAgent;
         ICodeLogger m_Logger;
         
@@ -114,6 +113,8 @@ namespace GLTFast.Export {
 
         Stream m_BufferStream;
         string m_BufferPath;
+
+        Dictionary<string, object> m_CustomData;
 #endregion Private
 
         /// <summary>
@@ -127,14 +128,12 @@ namespace GLTFast.Export {
         /// <seealso cref="ConsoleLogger"/></param>
         public GltfWriter(
             ExportSettings exportSettings = null,
-            ExportDelegates exportDelegates = null,
             IDeferAgent deferAgent = null,
             ICodeLogger logger = null
             )
         {
             m_Gltf = new Root();
             m_Settings = exportSettings ?? new ExportSettings();
-            m_Delegates = exportDelegates;
             m_Logger = logger;
             m_State = State.Initialized;
             m_DeferAgent = deferAgent ?? new UninterruptedDeferAgent();
@@ -157,7 +156,38 @@ namespace GLTFast.Export {
             m_Nodes.Add(node);
             return (uint) m_Nodes.Count - 1;
         }
-        
+
+        public bool SetCustomData(string name, object data)
+        {
+            m_CustomData ??= new Dictionary<string, object>(); 
+            return m_CustomData.TryAdd(name, data);
+        }
+
+        public T GetCustomData<T>(string name) where T: class
+        {
+            if (m_CustomData != null
+                && m_CustomData.TryGetValue(name, out var data))
+            {
+                return data as T;
+            }
+
+            return null;
+        }
+
+        public Node GetNode(int nodeId)
+        {
+            if (0 <= nodeId && nodeId < m_Nodes.Count)
+                return m_Nodes[nodeId];
+            return null;
+        }
+
+        public Schema.RootExtension GetRootExtension()
+        {
+            if (m_Gltf.extensions == null)
+                m_Gltf.extensions = new Schema.RootExtension(); 
+            return m_Gltf.extensions;
+        }
+
         /// <inheritdoc />
         public void AddMeshToNode(int nodeId, UnityEngine.Mesh uMesh, int[] materialIds) {
             CertifyNotDisposed();
@@ -599,7 +629,8 @@ namespace GLTFast.Export {
 
         async Task WriteJsonToStream(Stream outStream) {
             var writer = new StreamWriter(outStream);
-            m_Gltf.GltfSerialize(writer);
+
+            JsonParser.Serialize(writer, m_Gltf);
             await writer.FlushAsync();
         }
 
@@ -654,7 +685,7 @@ namespace GLTFast.Export {
             tasks.Add( BakeImages(directory) );
 
             // invokees are responsible to start their long standing export tasks
-            m_Delegates?.bake?.Invoke(directory, tasks);
+            ExportDelegates.bake?.Invoke(this, directory, tasks);
 
             await Task.WhenAll(tasks);
 
@@ -694,7 +725,7 @@ namespace GLTFast.Export {
             };
             
             // invokees are responsible to update m_Gltf members with previously collected/processed data
-            m_Delegates?.update?.Invoke(m_Gltf, this);
+            ExportDelegates.update?.Invoke(this);
 
             BakeExtensions();
 
@@ -1774,6 +1805,8 @@ namespace GLTFast.Export {
         }
 
         void Dispose() {
+            ExportDelegates.disposing?.Invoke(this);
+
             m_Settings = null;
 
             m_Logger = null;
@@ -1798,11 +1831,10 @@ namespace GLTFast.Export {
             m_Images = null;
             m_Textures = null;
             m_Samplers = null;
-            
+
+            m_CustomData = null;
+
             m_State = State.Disposed;
-            
-            m_Delegates?.dispose?.Invoke();
-            m_Delegates = null;
         }
         
         static unsafe int GetAttributeSize(VertexAttributeFormat format) {

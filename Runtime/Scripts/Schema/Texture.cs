@@ -36,6 +36,9 @@ namespace GLTFast.Schema {
         /// <inheritdoc cref="TextureExtension"/>
         public TextureExtension extensions;
 
+        /// <inheritdoc cref="TextureExtras"/>
+        public TextureExtras extras;
+
         /// <summary>
         /// Retrieves the final image index.
         /// </summary>

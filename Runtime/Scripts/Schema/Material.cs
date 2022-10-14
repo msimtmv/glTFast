@@ -62,6 +62,8 @@ namespace GLTFast.Schema {
         /// </summary>
         public MaterialExtension extensions;
 
+        /// <inheritdoc cref="MaterialExtras"/>
+        public MaterialExtras extras;
 
         /// <summary>
         /// A set of parameter values that are used to define the metallic-roughness

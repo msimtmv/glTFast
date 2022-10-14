@@ -85,6 +85,9 @@ namespace GLTFast.Schema {
         /// <inheritdoc cref="MeshPrimitiveExtensions"/>
         public MeshPrimitiveExtensions extensions;
 
+        /// <inheritdoc cref="MeshPrimitiveExtras"/>
+        public MeshPrimitiveExtras extras;
+
 #if DRACO_UNITY
         public bool isDracoCompressed {
             get {
@@ -293,6 +296,13 @@ namespace GLTFast.Schema {
             }
 #endif    
         }
+    }
+
+    /// <summary>
+    /// Mesh primitive extras
+    /// </summary>
+    [System.Serializable]
+    public class MeshPrimitiveExtras : ExtensibleObject {
     }
 
 #if DRACO_UNITY

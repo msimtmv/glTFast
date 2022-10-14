@@ -74,6 +74,9 @@ namespace GLTFast.Schema {
         /// <inheritdoc cref="NodeExtensions"/>
         public NodeExtensions extensions;
         
+        /// <inheritdoc cref="NodeExtras"/>
+        public NodeExtras extras;
+
         internal void GltfSerialize(JsonWriter writer) {
             writer.AddObject();
             GltfSerializeRoot(writer);
@@ -148,5 +151,12 @@ namespace GLTFast.Schema {
             }
             writer.Close();
         }
+    }
+
+    /// <summary>
+    /// Node extras
+    /// </summary>
+    [System.Serializable]
+    public class NodeExtras : ExtensibleObject {
     }
 }

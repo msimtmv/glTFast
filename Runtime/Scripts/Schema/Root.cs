@@ -115,8 +115,12 @@ namespace GLTFast.Schema {
         /// </summary>
         public Texture[] textures;
 
+        /// <inheritdoc cref="RootExtension"/>
         public RootExtension extensions;
-        
+
+        /// <inheritdoc cref="RootExtras"/>
+        public RootExtras extras;
+
 #if UNITY_ANIMATION
         public bool hasAnimation => animations != null && animations.Length > 0;
 #endif // UNITY_ANIMATION

@@ -94,6 +94,15 @@ namespace GLTFast.Schema {
 #if MESHOPT
         public BufferViewExtensions extensions;
 #endif
+
+        public BufferViewRootExtras extras;
+    }
+
+    /// <summary>
+    /// BufferView extras
+    /// </summary>
+    [System.Serializable]
+    public class BufferViewRootExtras : ExtensibleObject {
     }
 
 #if MESHOPT

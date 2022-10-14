@@ -28,5 +28,16 @@ namespace GLTFast.Schema
     {
         [NonSerialized]
         public Dictionary<string /*extension name*/, object /*extension specific data*/> genericProperties;
+
+        public bool SetProperty(string propertyName, object propertyValue)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+                return false;
+
+            genericProperties ??= new Dictionary<string, object>();
+            genericProperties[propertyName] = propertyValue;
+
+            return true;
+        }
     }
 }

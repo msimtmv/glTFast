@@ -95,14 +95,14 @@ namespace GLTFast.Schema {
         public BufferViewExtensions extensions;
 #endif
 
-        public BufferViewRootExtras extras;
+        public BufferViewExtras extras;
     }
 
     /// <summary>
     /// BufferView extras
     /// </summary>
     [System.Serializable]
-    public class BufferViewRootExtras : ExtensibleObject {
+    public class BufferViewExtras : ExtensibleObject {
     }
 
 #if MESHOPT

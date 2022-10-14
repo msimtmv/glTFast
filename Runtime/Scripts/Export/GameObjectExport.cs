@@ -198,7 +198,7 @@ namespace GLTFast.Export {
             }
 
             // invokees are responsible to collect information relevant to this game object
-            ExportDelegates.gameObjectAdded?.Invoke(m_Writer, gameObject, nodeId);
+            ExportDelegates.gameObjectAdded?.Invoke(m_Writer, gameObject, nodeId, m_MaterialExport);
 
             return success;
         }

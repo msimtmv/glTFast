@@ -44,7 +44,8 @@ namespace GLTFast.Export {
         );
 
         /// <summary>
-        /// Set generic data in this gltf writable. Typical use case are custom extensions.
+        /// Set generic transient data in this gltf. Typical use case is 
+        /// extension's bespoke export data.
         /// </summary>
         /// <param name="name">Unique name to register the data</param>
         /// <param name="data">Data to set</param>
@@ -59,8 +60,33 @@ namespace GLTFast.Export {
         /// <returns></returns>
         T GetCustomData<T>(string name) where T : class;
 
-        Schema.Node GetNode(int nodeId);
-        Schema.RootExtension GetRootExtension();
+        /// <summary>
+        /// Set extension/extras data.
+        /// </summary>
+        /// <param name="nodeId">Node id to set data to</param>
+        /// <param name="propertyName">Name of property to set</param>
+        /// <param name="propertyValue">Data of property to set</param>
+        /// <returns></returns>
+        bool SetRootNodeExtension(string propertyName, object propertyValue);
+        bool SetTootNodeExtras(string propertyName, object propertyValue);
+
+        bool SetNodeExtension(int nodeId, string propertyName, object propertyValue);
+        bool SetNodeExtras(int nodeId, string propertyName, object propertyValue);
+
+        bool SetMaterialExtension(int materialId, string propertyName, object propertyValue);
+        bool SetMaterialExtras(int materialId, string propertyName, object propertyValue);
+
+        bool SetTextureExtension(int textureId, string propertyName, object propertyValue);
+        bool SetTextureExtras(int textureId, string propertyName, object propertyValue);
+
+        bool SetTextureInfoExtension(int textureInfoId, string propertyName, object propertyValue);
+        bool SetTextureInfoExtras(int textureInfoId, string propertyName, object propertyValue);
+
+        bool SetBufferViewExtension(int bufferId, string propertyName, object propertyValue);
+        bool SetBufferViewExtras(int bufferId, string propertyName, object propertyValue);
+
+        bool SetMeshPrimitiveExtension(int primitiveId, string propertyName, object propertyValue);
+        bool SetMeshPrimitiveExtras(int primitiveId, string propertyName, object propertyValue);
 
         /// <summary>
         /// Assigns a mesh to a previously added node

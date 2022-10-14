@@ -91,6 +91,16 @@ namespace GLTFast.Export {
     /// <summary>
     /// Encapsulate delegates invoked by GameObjectExport and IGltfWritable sub classes.
     /// </summary>
+    ///
+    /// TODO: signature of those delegates are not correct; IGltfWritable sometimes
+    ///       needs parameters that are not available. Either create a context class
+    ///       and/or review IGltfWritable interface
+    ///
+    /// TODO: IGltfWritable des not seem to have query methods. Might be handy for custom
+    ///       extensions that need references to other gltf object
+    ///
+    /// TODO: delegates does not handle well dependencies (order of calls)
+    /// 
     public static class ExportDelegates {
         /// <summary>
         /// Invoked at the start of the export process.
@@ -105,7 +115,7 @@ namespace GLTFast.Export {
         /// <param name="gameObject">Game object to process</param>
         /// <param name="nodeId">gltf node to which this game object is tied to</param> 
         /// </summary>
-        public delegate void GameObjectAdded(IGltfWritable gltf, GameObject gameObject, int nodeId);
+        public delegate void GameObjectAdded(IGltfWritable gltf, GameObject gameObject, int nodeId, IMaterialExport materialExport);
         
         /// <summary>
         /// Invoked when a scene is processed. Invokee are responsible to collect
@@ -121,14 +131,14 @@ namespace GLTFast.Export {
         /// <param name="directory"></param>
         /// <param name="tasks">Add created tasks to this list so export process can be synchronized</param>
         /// </summary>
-        public delegate void Bake(IGltfWritable gltfWritable, string directory, List<Task<bool>> tasks);
+        public delegate void Bake(IGltfWritable gltf, string directory, List<Task<bool>> tasks);
 
         /// <summary>
         /// Invoked just before gltf is written to disk. Typical use case is to update relevant members
         /// of GLTFast.Schema.Root 
         /// <param name="gltf">Gltf object to store/retrieve info from</param>
         /// </summary>
-        public delegate void Update(IGltfWritable gltfWritable);
+        public delegate void Update(IGltfWritable gltf);
         
         /// <summary>
         /// Invoked when export process is done.

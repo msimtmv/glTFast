@@ -174,20 +174,6 @@ namespace GLTFast.Export {
             return null;
         }
 
-        public Node GetNode(int nodeId)
-        {
-            if (0 <= nodeId && nodeId < m_Nodes.Count)
-                return m_Nodes[nodeId];
-            return null;
-        }
-
-        public Schema.RootExtension GetRootExtension()
-        {
-            if (m_Gltf.extensions == null)
-                m_Gltf.extensions = new Schema.RootExtension(); 
-            return m_Gltf.extensions;
-        }
-
         /// <inheritdoc />
         public void AddMeshToNode(int nodeId, UnityEngine.Mesh uMesh, int[] materialIds) {
             CertifyNotDisposed();
@@ -1866,6 +1852,86 @@ namespace GLTFast.Export {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(format), format, null);
             }
+        }
+
+        public bool SetRootNodeExtension(string propertyName, object propertyValue)
+        {
+            CertifyNotDisposed();
+            m_Gltf.extensions ??= new Schema.RootExtension();
+            return m_Gltf.extensions.SetProperty(propertyName, propertyValue);
+        }
+        
+        public bool SetTootNodeExtras(string propertyName, object propertyValue)
+        {
+            CertifyNotDisposed();
+            m_Gltf.extras ??= new Schema.RootExtras();
+            return m_Gltf.extras.SetProperty(propertyName, propertyValue);
+        }
+        
+        public bool SetNodeExtension(int nodeId, string propertyName, object propertyValue)
+        {
+            CertifyNotDisposed();
+            var node = m_Nodes[nodeId];
+            node.extensions ??= new NodeExtensions();
+            return node.extensions.SetProperty(propertyName, propertyValue);
+        }
+        
+        public bool SetNodeExtras(int nodeId, string propertyName, object propertyValue)
+        {
+            CertifyNotDisposed();
+            var node = m_Nodes[nodeId];
+            node.extras ??= new NodeExtras();
+            return node.extras.SetProperty(propertyName, propertyValue);
+        }
+        
+        public bool SetMaterialExtension(int materialId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool SetMaterialExtras(int materialId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SetTextureExtension(int textureId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool SetTextureExtras(int textureId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SetTextureInfoExtension(int textureInfoId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool SetTextureInfoExtras(int textureInfoId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SetBufferViewExtension(int bufferId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool SetBufferViewExtras(int bufferId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool SetMeshPrimitiveExtension(int primitiveId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool SetMeshPrimitiveExtras(int primitiveId, string propertyName, object propertyValue)
+        {
+            throw new NotImplementedException();
         }
     }
 }

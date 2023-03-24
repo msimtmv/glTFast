@@ -190,7 +190,7 @@ namespace GLTFast
 #endif // UNITY_ANIMATION
 
         /// <inheritdoc />
-        public void CreateNode(
+        public virtual void CreateNode(
             uint nodeIndex,
             uint? parentIndex,
             Vector3 position,

@@ -73,6 +73,14 @@ namespace GLTFast.Schema
         /// <inheritdoc cref="NodeExtensions"/>
         public NodeExtensions extensions;
 
+        public Extras extras;
+
+        [System.Serializable]
+        public class Extras
+        {
+            public string uuid;
+        }
+
         internal void GltfSerialize(JsonWriter writer)
         {
             writer.AddObject();
